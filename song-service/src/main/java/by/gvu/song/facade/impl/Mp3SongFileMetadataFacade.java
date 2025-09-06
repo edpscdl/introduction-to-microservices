@@ -42,8 +42,8 @@ public class Mp3SongFileMetadataFacade implements SongFileMetadataFacade {
     }
 
     @Override
-    public List<Long> deleteFilesById(String stringListFileIds) throws SongServiceValidationException {
-        return songFileMetadataService.deleteFilesById(validateAndConvetStringIdsToListLong(stringListFileIds));
+    public Long deleteMetadataById(String stringMetadataId) throws SongServiceValidationException {
+        return songFileMetadataService.deleteMetadataById(validateAndConvertStringIdToLong(stringMetadataId));
     }
 
     private Long validateAndConvertStringIdToLong(String id) throws SongServiceValidationException {

@@ -9,5 +9,5 @@ public interface SongFileMetadataFacade {
     Mp3FileMetadataResponce createMetadata(Mp3FileMetadataDto mp3FileMetadata);
     Mp3FileMetadataDto readMetadata(String id);
 
-    List<Long> deleteFilesById(String ids);
+    Long deleteMetadataById(String id);
 }

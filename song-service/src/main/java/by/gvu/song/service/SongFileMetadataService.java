@@ -7,5 +7,5 @@ import java.util.List;
 public interface SongFileMetadataService {
     Mp3FileMetadataModel createMetadata(Mp3FileMetadataModel mp3FileMetadata);
     Mp3FileMetadataModel readMetadata(Long id);
-    List<Long> deleteFilesById(List<Long> longs);
+    Long deleteMetadataById(Long id);
 }

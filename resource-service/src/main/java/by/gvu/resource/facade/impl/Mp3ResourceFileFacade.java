@@ -10,6 +10,7 @@ import by.gvu.resource.model.dto.Mp3FileMetadataResponce;
 import by.gvu.resource.model.dto.Mp3FileResponce;
 import by.gvu.resource.service.impl.Mp3FileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class Mp3ResourceFileFacade implements ResourceFileFacade<Mp3FileResponce
             }
         } catch (Exception e) {
             if (mp3FileMetadataDto != null) {
-                //delete metadata
+                songServiceClient.deleteMp3(mp3FileModel.getId().toString());
             }
 
             if (mp3FileModel != null) {
@@ -62,7 +63,11 @@ public class Mp3ResourceFileFacade implements ResourceFileFacade<Mp3FileResponce
 
     @Override
     public List<Long> deleteFilesById(String stringListFileIds) throws ResourceServiceValidationException {
-        return fileService.deleteFilesById(validateAndConvetStringIdsToListLong(stringListFileIds));
+        List<Long> deletedFileIds = fileService.deleteFilesById(validateAndConvetStringIdsToListLong(stringListFileIds));
+
+        List<ResponseEntity<Map<String, Long>>> deletedMetadataIds = deletedFileIds.stream().map(id -> songServiceClient.deleteMp3(id.toString())).toList();
+
+        return deletedFileIds;
     }
 
     private Long validateAndConvertStringIdToLong(String id) throws ResourceServiceValidationException {

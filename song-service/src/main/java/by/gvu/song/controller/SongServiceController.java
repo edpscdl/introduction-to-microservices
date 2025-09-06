@@ -34,7 +34,7 @@ public class SongServiceController {
     }
 
     @DeleteMapping("/songs")
-    public ResponseEntity<Map<String, List<Long>>> deleteMp3(@RequestParam("id") String ids) {
-        return ResponseEntity.ok(Map.of("ids", songFileMetadataFacade.deleteFilesById(ids)));
+    public ResponseEntity<Map<String, Long>> deleteMp3(@RequestParam("id") String id) {
+        return ResponseEntity.ok(Map.of("ids", songFileMetadataFacade.deleteMetadataById(id)));
     }
 }

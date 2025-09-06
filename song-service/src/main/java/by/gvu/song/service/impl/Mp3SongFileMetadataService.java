@@ -17,9 +17,9 @@ public class Mp3SongFileMetadataService implements SongFileMetadataService {
 
     @Override
     public Mp3FileMetadataModel createMetadata(Mp3FileMetadataModel mp3FileMetadata) {
-        if (readMetadata(mp3FileMetadata.getId())!=null) {
-            throw new SongServiceDuplicateSourceException("Duplicate source ["+mp3FileMetadata.getId()+"]");
-        }
+//        if (readMetadata(mp3FileMetadata.getId())!=null) {
+//            throw new SongServiceDuplicateSourceException("Duplicate source ["+mp3FileMetadata.getId()+"]");
+//        }
         return repository.save(mp3FileMetadata);
     }
 
@@ -29,9 +29,9 @@ public class Mp3SongFileMetadataService implements SongFileMetadataService {
     }
 
     @Override
-    public List<Long> deleteFilesById(List<Long> fileIds) {
-        List<Long> avaibleFileIds = repository.findAllById(fileIds).stream().map(Mp3FileMetadataModel::getId).toList();
-        repository.deleteAllById(avaibleFileIds);
-        return avaibleFileIds;
+    public Long deleteMetadataById(Long id) {
+        Mp3FileMetadataModel metadata = repository.findById(id).orElseThrow(() -> new SongServiceMetadataNotFoundException("Metadata with id " + id + " not found"));
+        repository.deleteById(metadata.getId());
+        return metadata.getId();
     }
 }
