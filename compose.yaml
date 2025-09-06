@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  resource-db:
+    image: postgres:17.6-alpine3.22
+    container_name: resource_db
+    restart: always
+    environment:
+      POSTGRES_USER: resource_user         # Имя пользователя для базы данных resource
+      POSTGRES_PASSWORD: resource_password # Пароль для пользователя resource
+      POSTGRES_DB: resource                # Название первоначальной базы данных resource
+    ports:
+      - "5432:5432"                        # Локальный порт : порт внутри контейнера
+    volumes:
+      - resource_db_data:/var/lib/postgresql/data
+    networks:
+      - postgres-network
+
+  song-db:
+    image: postgres:17.6-alpine3.22
+    container_name: song_db
+    restart: always
+    environment:
+      POSTGRES_USER: song_user             # Имя пользователя для базы данных song
+      POSTGRES_PASSWORD: song_password     # Пароль для пользователя song
+      POSTGRES_DB: song                    # Название первоначальной базы данных song
+    ports:
+      - "5433:5432"                        # Локальный порт : порт внутри контейнера
+    volumes:
+      - song_db_data:/var/lib/postgresql/data
+    networks:
+      - postgres-network
+
+volumes:
+  resource_db_data:
+  song_db_data:
+
+networks:
+  postgres-network:
+    driver: bridge
