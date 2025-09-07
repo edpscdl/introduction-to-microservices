@@ -1,4 +1,4 @@
-package by.gvu.resource.model.dto;
+package by.gvu.resource.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

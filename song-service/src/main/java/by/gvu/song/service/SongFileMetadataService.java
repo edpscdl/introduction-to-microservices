@@ -1,11 +1,10 @@
 package by.gvu.song.service;
 
-import by.gvu.song.model.data.Mp3FileMetadataModel;
-
 import java.util.List;
+import java.util.Optional;
 
-public interface SongFileMetadataService {
-    Mp3FileMetadataModel createMetadata(Mp3FileMetadataModel mp3FileMetadata);
-    Mp3FileMetadataModel readMetadata(Long id);
-    Long deleteMetadataById(Long id);
+public interface SongFileMetadataService<S, I> {
+    I create(S metadata);
+    Optional<S> getById(I id);
+    List<I> deleteByCsvIds(List<I> ids);
 }

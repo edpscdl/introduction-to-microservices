@@ -1,17 +1,17 @@
 package by.gvu.song.controller;
 
-import by.gvu.song.facade.SongFileMetadataFacade;
-import by.gvu.song.model.dto.Mp3FileMetadataDto;
-import by.gvu.song.model.dto.Mp3FileMetadataResponce;
+import by.gvu.song.dto.Mp3FileMetadataRequestDto;
+import by.gvu.song.dto.Mp3FileMetadataResponceDto;
+import by.gvu.song.facade.impl.Mp3MetadataSongServiceFacade;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,22 +19,23 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/songs")
 @RequiredArgsConstructor
 public class SongServiceController {
-    private final SongFileMetadataFacade songFileMetadataFacade;
+    private final Mp3MetadataSongServiceFacade mp3MetadataSongServiceFacade;
 
-    @PostMapping(value = "/songs", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Mp3FileMetadataResponce> uploadMp3(@RequestBody @Validated Mp3FileMetadataDto mp3FileMetadata) {
-        return ResponseEntity.ok(songFileMetadataFacade.createMetadata(mp3FileMetadata));
+    @PostMapping
+    public ResponseEntity<Map<String, Long>> create(@Valid @RequestBody Mp3FileMetadataRequestDto mp3FileMetadataRequestDto) {
+        return ResponseEntity.ok(Map.of("id", mp3MetadataSongServiceFacade.create(mp3FileMetadataRequestDto)));
     }
 
-    @GetMapping("/songs/{id}")
-    public ResponseEntity<Mp3FileMetadataDto> getMetadata(@PathVariable("id") String id) {
-        return ResponseEntity.ok(songFileMetadataFacade.readMetadata(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<Mp3FileMetadataResponceDto> get(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(mp3MetadataSongServiceFacade.getById(id));
     }
 
-    @DeleteMapping("/songs")
-    public ResponseEntity<Map<String, Long>> deleteMp3(@RequestParam("id") String id) {
-        return ResponseEntity.ok(Map.of("ids", songFileMetadataFacade.deleteMetadataById(id)));
+    @DeleteMapping
+    public ResponseEntity<Map<String, List<Long>>> delete(@RequestParam("id") String csvIds) {
+        return ResponseEntity.ok(Map.of("ids", mp3MetadataSongServiceFacade.deleteByCsvIds(csvIds)));
     }
 }

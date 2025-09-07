@@ -1,8 +1,8 @@
 package by.gvu.resource.service.impl;
 
+import by.gvu.resource.dto.Mp3FileMetadataRequestDto;
 import by.gvu.resource.exception.ResourceServiceParseMetadataException;
-import by.gvu.resource.model.data.Mp3FileModel;
-import by.gvu.resource.model.dto.Mp3FileMetadataDto;
+import by.gvu.resource.model.Mp3FileModel;
 import by.gvu.resource.service.MetadataService;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -12,12 +12,11 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.time.Duration;
 
 @Service
-public class Mp3MetadataService implements MetadataService<Mp3FileModel, Mp3FileMetadataDto> {
+public class Mp3MetadataService implements MetadataService<Mp3FileModel, Mp3FileMetadataRequestDto> {
     @Override
-    public Mp3FileMetadataDto readMetadata(Mp3FileModel mp3FileModel) throws ResourceServiceParseMetadataException {
+    public Mp3FileMetadataRequestDto readMetadata(Mp3FileModel mp3FileModel) {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(mp3FileModel.getData())) {
             BodyContentHandler handler = new BodyContentHandler();
             Metadata metadata = new Metadata();
@@ -26,15 +25,14 @@ public class Mp3MetadataService implements MetadataService<Mp3FileModel, Mp3File
 
             parser.parse(inputStream, handler, metadata, parseContext);
 
-            Mp3FileMetadataDto mp3FileMetadataDto = new Mp3FileMetadataDto();
-            mp3FileMetadataDto.setId(mp3FileModel.getId());
-            mp3FileMetadataDto.setName(metadata.get("dc:title"));
-            mp3FileMetadataDto.setArtist(metadata.get("xmpDM:artist"));
-            mp3FileMetadataDto.setAlbum(metadata.get("xmpDM:album"));
-            mp3FileMetadataDto.setDuration(convertStringDoubleToDuration(metadata.get("xmpDM:duration")));
-            mp3FileMetadataDto.setYear(convertStringToYear(metadata.get("xmpDM:releaseDate")));
-
-            return mp3FileMetadataDto;
+            return Mp3FileMetadataRequestDto.builder()
+                    .id(mp3FileModel.getId())
+                    .name(metadata.get("dc:title"))
+                    .artist(metadata.get("xmpDM:artist"))
+                    .album(metadata.get("xmpDM:album"))
+                    .duration(convertStringDoubleToDuration(metadata.get("xmpDM:duration")))
+                    .year(convertStringToYear(metadata.get("xmpDM:releaseDate")))
+                    .build();
         } catch (Exception e) {
             throw new ResourceServiceParseMetadataException("Failed to read metadata");
         }

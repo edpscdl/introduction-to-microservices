@@ -1,7 +1,6 @@
 package by.gvu.resource.client;
 
-import by.gvu.resource.model.dto.Mp3FileMetadataDto;
-import by.gvu.resource.model.dto.Mp3FileMetadataResponce;
+import by.gvu.resource.dto.Mp3FileMetadataRequestDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "song-service", url = "http://localhost:8081", configuration = FeignConfiguration.class)
+@FeignClient(name = "song-service", url = "http://localhost:8081/songs", configuration = FeignConfiguration.class)
 public interface SongServiceClient {
 
-    @PostMapping("/songs")
-    Mp3FileMetadataResponce createSong(@RequestBody Mp3FileMetadataDto mp3FileMetadataDto);
+    @PostMapping
+    ResponseEntity<Map<String, Long>> create(@RequestBody Mp3FileMetadataRequestDto mp3FileMetadataRequestDto);
 
-    @DeleteMapping("/songs")
-    ResponseEntity<Map<String, Long>> deleteMp3(@RequestParam("id") String id);
+    @DeleteMapping
+    ResponseEntity<Map<String, List<Long>>> delete(@RequestParam("id") String csvIds);
 }

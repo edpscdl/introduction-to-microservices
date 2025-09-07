@@ -3,17 +3,14 @@ package by.gvu.resource.controller.advice;
 import by.gvu.resource.exception.ResourceServiceBaseException;
 import by.gvu.resource.exception.ResourceServiceFileNotFountException;
 import by.gvu.resource.exception.ResourceServiceValidationException;
-import by.gvu.resource.model.dto.ErrorResponse;
+import by.gvu.resource.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

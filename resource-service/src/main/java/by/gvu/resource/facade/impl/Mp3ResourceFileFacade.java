@@ -1,14 +1,14 @@
 package by.gvu.resource.facade.impl;
 
 import by.gvu.resource.client.SongServiceClient;
+import by.gvu.resource.dto.Mp3FileMetadataRequestDto;
 import by.gvu.resource.exception.ResourceServiceBaseException;
+import by.gvu.resource.exception.ResourceServiceFileNotFountException;
 import by.gvu.resource.exception.ResourceServiceValidationException;
 import by.gvu.resource.facade.ResourceFileFacade;
-import by.gvu.resource.model.data.Mp3FileModel;
-import by.gvu.resource.model.dto.Mp3FileMetadataDto;
-import by.gvu.resource.model.dto.Mp3FileMetadataResponce;
-import by.gvu.resource.model.dto.Mp3FileResponce;
-import by.gvu.resource.service.impl.Mp3FileService;
+import by.gvu.resource.model.Mp3FileModel;
+import by.gvu.resource.service.impl.Mp3MetadataService;
+import by.gvu.resource.service.impl.Mp3ResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,58 +23,65 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class Mp3ResourceFileFacade implements ResourceFileFacade<Mp3FileResponce, Long> {
-    private final Mp3FileService fileService;
+public class Mp3ResourceFileFacade implements ResourceFileFacade<Long> {
+    private final Mp3ResourceService mp3ResourceService;
+    private final Mp3MetadataService mp3MetadataService;
     private final SongServiceClient songServiceClient;
 
     @Override
-    public Mp3FileResponce uploadFile(byte[] mp3FileData) {
+    public Long uploadFile(byte[] mp3FileData) {
 
-        Mp3FileModel mp3FileModel = null;
-        Mp3FileMetadataDto mp3FileMetadataDto = null;
+        Mp3FileModel createdMp3FileModel = null;
+        Mp3FileMetadataRequestDto mp3FileMetadataRequestDto = null;
 
         try {
-            mp3FileModel = fileService.saveFile(mp3FileData);
-            mp3FileMetadataDto = fileService.readMetadata(mp3FileModel.getId());
+            createdMp3FileModel = mp3ResourceService.saveFileData(mp3FileData);
 
-            Mp3FileMetadataResponce metadataResponce = songServiceClient.createSong(mp3FileMetadataDto);
+            mp3FileMetadataRequestDto = mp3MetadataService.readMetadata(createdMp3FileModel);
 
-            if (metadataResponce.id().equals(mp3FileModel.getId())) {
-                return new Mp3FileResponce(mp3FileModel.getId());
+            ResponseEntity<Map<String, Long>> responseEntity = songServiceClient.create(mp3FileMetadataRequestDto);
+
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                return responseEntity.getBody().get("id");
             } else {
-                throw new ResourceServiceBaseException("Song id is not equal to file id");
+                throw new ResourceServiceBaseException("Song service returned error code: " + responseEntity.getStatusCode());
             }
         } catch (Exception e) {
-            if (mp3FileMetadataDto != null) {
-                songServiceClient.deleteMp3(mp3FileModel.getId().toString());
-            }
+            if (createdMp3FileModel != null) {
+                mp3ResourceService.deleteById(createdMp3FileModel.getId());
 
-            if (mp3FileModel != null) {
-                fileService.deleteFilesById(Collections.singletonList(mp3FileModel.getId()));
+                if (mp3FileMetadataRequestDto != null) {
+                    songServiceClient.delete(createdMp3FileModel.getId().toString());
+                }
             }
-            throw e;
+            throw new ResourceServiceBaseException("Error saving song");
         }
     }
 
     @Override
-    public byte[] downloadFile(String stringFileId) throws ResourceServiceValidationException {
-        return fileService.getFile(validateAndConvertStringIdToLong(stringFileId));
+    public byte[] downloadFile(String stringFileId) {
+        return mp3ResourceService.getFileData(validateAndConvertStringIdToLong(stringFileId)).orElseThrow(() -> new ResourceServiceFileNotFountException("File ["+stringFileId+"] not found")).getData();
     }
 
     @Override
-    public List<Long> deleteFilesById(String stringListFileIds) throws ResourceServiceValidationException {
-        List<Long> deletedFileIds = fileService.deleteFilesById(validateAndConvetStringIdsToListLong(stringListFileIds));
+    public List<Long> deleteFilesById(String stringListFileIds) {
 
-        List<ResponseEntity<Map<String, Long>>> deletedMetadataIds = deletedFileIds.stream().map(id -> songServiceClient.deleteMp3(id.toString())).toList();
+        List<Long> validIds = validateAndConvetListStringIdToListLong(stringListFileIds);
 
-        return deletedFileIds;
+        try {
+            ResponseEntity<Map<String, List<Long>>> deletedMetadataIds = songServiceClient.delete(validIds.stream().map(Object::toString).collect(Collectors.joining(",")));
+
+            return mp3ResourceService.deleteByCsvIds(validIds);
+        } catch (Exception e) {
+            throw new ResourceServiceBaseException("Error deleting song");
+        }
     }
 
-    private Long validateAndConvertStringIdToLong(String id) throws ResourceServiceValidationException {
-        return validateAndConvetStringIdsToListLong(id).stream().findFirst().orElseThrow(() -> new ResourceServiceValidationException(Map.of("id", "id cannot be empty")));
+    private Long validateAndConvertStringIdToLong(String id) {
+        return validateAndConvetListStringIdToListLong(id).stream().findFirst().orElseThrow(() -> new ResourceServiceValidationException(Map.of("id", "value '" + id + "' is invalid")));
     }
 
-    private List<Long> validateAndConvetStringIdsToListLong(String ids) throws ResourceServiceValidationException {
+    private List<Long> validateAndConvetListStringIdToListLong(String ids) {
         if (ids == null) {
             return Collections.emptyList();
         }

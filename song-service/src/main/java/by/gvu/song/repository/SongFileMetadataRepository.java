@@ -1,6 +1,6 @@
 package by.gvu.song.repository;
 
-import by.gvu.song.model.data.Mp3FileMetadataModel;
+import by.gvu.song.model.Mp3FileMetadataModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

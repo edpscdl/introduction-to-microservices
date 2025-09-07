@@ -1,11 +1,11 @@
-package by.gvu.resource.model.dto;
+package by.gvu.resource.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
-import java.time.Duration;
-
 @Data
-public class Mp3FileMetadataDto {
+@Builder
+public class Mp3FileMetadataRequestDto {
     private Long id;
     private String name;
     private String artist;

@@ -1,37 +1,46 @@
 package by.gvu.song.service.impl;
 
 import by.gvu.song.exception.SongServiceDuplicateSourceException;
-import by.gvu.song.exception.SongServiceMetadataNotFoundException;
-import by.gvu.song.model.data.Mp3FileMetadataModel;
+import by.gvu.song.model.Mp3FileMetadataModel;
 import by.gvu.song.repository.SongFileMetadataRepository;
 import by.gvu.song.service.SongFileMetadataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class Mp3SongFileMetadataService implements SongFileMetadataService {
+public class Mp3SongFileMetadataService implements SongFileMetadataService<Mp3FileMetadataModel, Long> {
     private final SongFileMetadataRepository repository;
 
+
     @Override
-    public Mp3FileMetadataModel createMetadata(Mp3FileMetadataModel mp3FileMetadata) {
-//        if (readMetadata(mp3FileMetadata.getId())!=null) {
-//            throw new SongServiceDuplicateSourceException("Duplicate source ["+mp3FileMetadata.getId()+"]");
-//        }
-        return repository.save(mp3FileMetadata);
+    @Transactional
+    public Long create(Mp3FileMetadataModel metadata) {
+        if (repository.existsById(metadata.getId())) {
+            throw new SongServiceDuplicateSourceException("Duplicate source ["+metadata.getId()+"]");
+        }
+
+        Mp3FileMetadataModel savedMatadata = repository.save(metadata);
+        return savedMatadata.getId();
     }
 
     @Override
-    public Mp3FileMetadataModel readMetadata(Long id) {
-        return repository.findById(id).orElseThrow(() -> new SongServiceMetadataNotFoundException("Metadata with id " + id + " not found"));
+    @Transactional(readOnly = true)
+    public Optional<Mp3FileMetadataModel> getById(Long id) {
+        return repository.findById(id);
     }
 
     @Override
-    public Long deleteMetadataById(Long id) {
-        Mp3FileMetadataModel metadata = repository.findById(id).orElseThrow(() -> new SongServiceMetadataNotFoundException("Metadata with id " + id + " not found"));
-        repository.deleteById(metadata.getId());
-        return metadata.getId();
+    @Transactional
+    public List<Long> deleteByCsvIds(List<Long> ids) {
+        List<Long> foundMetadataIds = repository.findAllById(ids).stream().map(Mp3FileMetadataModel::getId).toList();
+
+        foundMetadataIds.forEach(repository::deleteById);
+
+        return foundMetadataIds;
     }
 }

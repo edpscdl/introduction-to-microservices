@@ -1,11 +1,13 @@
 package by.gvu.song.exception;
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 
 import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
+@Data
 public class SongServiceValidationException extends SongServiceBaseException {
     @Serial
     private static final long serialVersionUID = 7276872940926132357L;
