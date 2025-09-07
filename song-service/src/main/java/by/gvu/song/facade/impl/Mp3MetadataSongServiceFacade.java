@@ -2,6 +2,7 @@ package by.gvu.song.facade.impl;
 
 import by.gvu.song.dto.Mp3FileMetadataRequestDto;
 import by.gvu.song.dto.Mp3FileMetadataResponceDto;
+import by.gvu.song.exception.SongServiceBaseException;
 import by.gvu.song.exception.SongServiceMetadataNotFoundException;
 import by.gvu.song.exception.SongServiceValidationException;
 import by.gvu.song.facade.SongServiceFacade;
@@ -49,7 +50,7 @@ public class Mp3MetadataSongServiceFacade implements SongServiceFacade<Mp3FileMe
         }
 
         if (ids.length() > 200) {
-            throw new SongServiceValidationException(Map.of("id", "The length of parameter id cannot be more than 200. current '" + ids.length() + "'"));
+            throw new SongServiceBaseException("The length of parameter id cannot be more than 200. current '" + ids.length() + "'");
         }
 
         List<String> invalidValues = new ArrayList<>();

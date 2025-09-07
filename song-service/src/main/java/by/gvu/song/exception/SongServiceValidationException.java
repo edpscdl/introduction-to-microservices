@@ -1,12 +1,14 @@
 package by.gvu.song.exception;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpStatus;
 
 import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class SongServiceValidationException extends SongServiceBaseException {
     @Serial
