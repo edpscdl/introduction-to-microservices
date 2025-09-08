@@ -15,7 +15,7 @@ import java.util.Map;
 @Builder
 public class ErrorResponse {
     private String errorMessage;
+    private String errorCode;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, List<String>> details;
-    private Integer errorCode;
 }

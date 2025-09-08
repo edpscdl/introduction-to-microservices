@@ -30,10 +30,10 @@ public class Mp3ResourceService implements ResourceService<Mp3FileModel, Long> {
 
     @Override
     public List<Long> deleteByCsvIds(List<Long> ids) {
-        List<Long> avaibleListFileData = repository.findAllById(ids).stream().map(Mp3FileModel::getId).toList();
+        List<Long> availableListFileData = repository.findAllById(ids).stream().map(Mp3FileModel::getId).toList();
 
-        repository.deleteAllById(avaibleListFileData);
+        repository.deleteAllById(availableListFileData);
 
-        return avaibleListFileData;
+        return availableListFileData;
     }
 }

@@ -41,7 +41,7 @@ public class Mp3MetadataService implements MetadataService<Mp3FileModel, Mp3File
     private String convertStringDoubleToDuration(String duration) {
         double totalSeconds = Double.parseDouble(duration);
         long minutes = (long) totalSeconds / 60;
-        long seconds = Math.round(totalSeconds % 60);
+        long seconds = (long) totalSeconds % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
 

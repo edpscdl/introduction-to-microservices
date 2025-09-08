@@ -1,7 +1,7 @@
 package by.gvu.song.facade.impl;
 
 import by.gvu.song.dto.Mp3FileMetadataRequestDto;
-import by.gvu.song.dto.Mp3FileMetadataResponceDto;
+import by.gvu.song.dto.Mp3FileMetadataResponseDto;
 import by.gvu.song.exception.SongServiceBaseException;
 import by.gvu.song.exception.SongServiceMetadataNotFoundException;
 import by.gvu.song.exception.SongServiceValidationException;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class Mp3MetadataSongServiceFacade implements SongServiceFacade<Mp3FileMetadataRequestDto, Mp3FileMetadataResponceDto, Long> {
+public class Mp3MetadataSongServiceFacade implements SongServiceFacade<Mp3FileMetadataRequestDto, Mp3FileMetadataResponseDto, Long> {
     private final Mp3SongFileMetadataService songFileMetadataService;
     private final ConversionService conversionService;
 
@@ -32,9 +32,9 @@ public class Mp3MetadataSongServiceFacade implements SongServiceFacade<Mp3FileMe
     }
 
     @Override
-    public Mp3FileMetadataResponceDto getById(Long id) {
+    public Mp3FileMetadataResponseDto getById(Long id) {
         Mp3FileMetadataModel metadataModel = songFileMetadataService.getById(id).orElseThrow(() -> new SongServiceMetadataNotFoundException("Metadata with id [" + id + "] not found"));
-        return conversionService.convert(metadataModel, Mp3FileMetadataResponceDto.class);
+        return conversionService.convert(metadataModel, Mp3FileMetadataResponseDto.class);
     }
 
     @Override

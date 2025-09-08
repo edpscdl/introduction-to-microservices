@@ -7,11 +7,11 @@ import lombok.Data;
 import java.util.List;
 import java.util.Map;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Builder
 public class ErrorResponse {
     private String errorMessage;
-    private Integer errorCode;
+    private String errorCode;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, List<String>> details;
 }

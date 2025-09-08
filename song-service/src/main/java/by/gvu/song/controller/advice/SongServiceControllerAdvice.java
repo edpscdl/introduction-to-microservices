@@ -27,7 +27,7 @@ public class SongServiceControllerAdvice {
                 .status(exception.getCode())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder()
-                        .errorCode(exception.getCode().value())
+                        .errorCode(Integer.toString(exception.getCode().value()))
                         .errorMessage(exception.getMessage())
                         .build());
     }
@@ -38,7 +38,7 @@ public class SongServiceControllerAdvice {
                 .status(exception.getCode())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder()
-                        .errorCode(exception.getCode().value())
+                        .errorCode(Integer.toString(exception.getCode().value()))
                         .errorMessage(exception.getMessage())
                         .build());
     }
@@ -56,7 +56,7 @@ public class SongServiceControllerAdvice {
                 .status(exception.getCode())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder()
-                        .errorCode(HttpStatus.BAD_REQUEST.value())
+                        .errorCode(Integer.toString(HttpStatus.BAD_REQUEST.value()))
                         .errorMessage(exception.getMessage())
                         .details(errorDetails)
                         .build());
@@ -77,7 +77,7 @@ public class SongServiceControllerAdvice {
                 .status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder()
-                        .errorCode(HttpStatus.BAD_REQUEST.value())
+                        .errorCode(Integer.toString(HttpStatus.BAD_REQUEST.value()))
                         .errorMessage("Validation error")
                         .details(errorDetails)
                         .build());
@@ -89,7 +89,7 @@ public class SongServiceControllerAdvice {
                 .status(exception.getCode())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder()
-                        .errorCode(exception.getCode().value())
+                        .errorCode(Integer.toString(exception.getCode().value()))
                         .errorMessage(exception.getMessage())
                         .build());
     }

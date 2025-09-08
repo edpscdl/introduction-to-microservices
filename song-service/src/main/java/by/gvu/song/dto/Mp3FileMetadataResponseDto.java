@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Mp3FileMetadataResponceDto {
+public class Mp3FileMetadataResponseDto {
     private Long id;
     private String name;
     private String artist;

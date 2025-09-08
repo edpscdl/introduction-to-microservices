@@ -11,4 +11,4 @@ spring:
       ddl-auto: update
     show-sql: true
 server:
-  port: ${RESOURCE_SERVER_PORT:8081}
+  port: ${SONG_SERVER_PORT:8081}

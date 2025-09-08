@@ -1,7 +1,7 @@
 package by.gvu.song.controller;
 
 import by.gvu.song.dto.Mp3FileMetadataRequestDto;
-import by.gvu.song.dto.Mp3FileMetadataResponceDto;
+import by.gvu.song.dto.Mp3FileMetadataResponseDto;
 import by.gvu.song.facade.impl.Mp3MetadataSongServiceFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class SongServiceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Mp3FileMetadataResponceDto> get(@PathVariable("id") Long id) {
+    public ResponseEntity<Mp3FileMetadataResponseDto> get(@PathVariable("id") Long id) {
         return ResponseEntity.ok(mp3MetadataSongServiceFacade.getById(id));
     }
 

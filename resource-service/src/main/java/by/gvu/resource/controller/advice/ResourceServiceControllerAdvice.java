@@ -24,8 +24,8 @@ public class ResourceServiceControllerAdvice {
                 .status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder()
-                        .errorCode(HttpStatus.BAD_REQUEST.value())
-                        .errorMessage("Content-Type '" + exception.getContentType() + "' is not supported")
+                        .errorCode(Integer.toString(HttpStatus.BAD_REQUEST.value()))
+                        .errorMessage("Invalid file format: " + exception.getContentType() + ". Only MP3 files are allowed")
                         .build());
     }
 
@@ -35,7 +35,7 @@ public class ResourceServiceControllerAdvice {
                 .status(exception.getCode())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder()
-                        .errorCode(exception.getCode().value())
+                        .errorCode(Integer.toString(exception.getCode().value()))
                         .errorMessage(exception.getMessage())
                         .build());
     }
@@ -53,7 +53,7 @@ public class ResourceServiceControllerAdvice {
                 .status(exception.getCode())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder()
-                        .errorCode(HttpStatus.BAD_REQUEST.value())
+                        .errorCode(Integer.toString(HttpStatus.BAD_REQUEST.value()))
                         .errorMessage(exception.getMessage())
                         .details(errorDetails)
                         .build());
@@ -65,7 +65,7 @@ public class ResourceServiceControllerAdvice {
                 .status(exception.getCode())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder()
-                        .errorCode(exception.getCode().value())
+                        .errorCode(Integer.toString(exception.getCode().value()))
                         .errorMessage(exception.getMessage())
                         .build());
     }
