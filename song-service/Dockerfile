@@ -6,11 +6,12 @@ COPY gradlew gradlew
 COPY gradlew.bat gradlew.bat
 COPY gradle gradle
 COPY song-service/build.gradle build.gradle
-COPY song-service/src src
 
 RUN chmod +x gradlew
 
 RUN ./gradlew dependencies --no-daemon
+
+COPY song-service/src src
 
 RUN ./gradlew assemble --no-daemon -x test
 
