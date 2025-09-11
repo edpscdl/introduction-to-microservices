@@ -11,6 +11,8 @@ services:
       POSTGRES_DB: resource
     ports:
       - "${POSTGRES_RESOURCE_PORT}:5432"
+    volumes:
+      - ./init-db/resource-db:/docker-entrypoint-initdb.d/
 
   song-db:
     image: postgres:17.6-alpine3.22
