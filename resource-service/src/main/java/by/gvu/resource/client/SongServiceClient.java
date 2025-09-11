@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "song-service", url = "${rest.song_endpoint}", configuration = FeignConfiguration.class)
+@FeignClient(name = "song-service", url = "http://localhost:8081/songs", configuration = FeignConfiguration.class)
 public interface SongServiceClient {
 
     @PostMapping
