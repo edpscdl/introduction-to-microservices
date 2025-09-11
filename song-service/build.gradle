@@ -30,3 +30,7 @@ dependencies {
 
     runtimeOnly 'org.postgresql:postgresql'
 }
+
+jar {
+    enabled = false
+}

@@ -3,38 +3,60 @@ version: '3.9'
 services:
   resource-db:
     image: postgres:17.6-alpine3.22
-    container_name: resource_db
+    container_name: resource-db
     restart: always
     environment:
-      POSTGRES_USER: resource_user         # Имя пользователя для базы данных resource
-      POSTGRES_PASSWORD: resource_password # Пароль для пользователя resource
-      POSTGRES_DB: resource                # Название первоначальной базы данных resource
+      POSTGRES_USER: ${POSTGRES_RESOURCE_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_RESOURCE_PASSWORD}
+      POSTGRES_DB: resource
     ports:
-      - "5432:5432"                        # Локальный порт : порт внутри контейнера
-    volumes:
-      - resource_db_data:/var/lib/postgresql/data
-    networks:
-      - postgres-network
+      - "${POSTGRES_RESOURCE_PORT}:5432"
 
   song-db:
     image: postgres:17.6-alpine3.22
-    container_name: song_db
+    container_name: song-db
     restart: always
     environment:
-      POSTGRES_USER: song_user             # Имя пользователя для базы данных song
-      POSTGRES_PASSWORD: song_password     # Пароль для пользователя song
-      POSTGRES_DB: song                    # Название первоначальной базы данных song
+      POSTGRES_USER: ${POSTGRES_SONG_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_SONG_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_SONG_DB}
     ports:
-      - "5433:5432"                        # Локальный порт : порт внутри контейнера
+      - "${POSTGRES_SONG_PORT}:5432"
     volumes:
-      - song_db_data:/var/lib/postgresql/data
-    networks:
-      - postgres-network
+      - ./init-db/song-db:/docker-entrypoint-initdb.d/
 
-volumes:
-  resource_db_data:
-  song_db_data:
+  resource-service:
+    build:
+      context: .
+      dockerfile: ./resource-service/Dockerfile
+    container_name: resource-service
+    depends_on:
+      - resource-db
+    environment:
+      - POSTGRES_RESOURCE_HOST=resource-db
+      - POSTGRES_RESOURCE_PORT=5432
+      - POSTGRES_RESOURCE_DB=${POSTGRES_RESOURCE_DB}
+      - POSTGRES_RESOURCE_USER=${POSTGRES_RESOURCE_USER}
+      - POSTGRES_RESOURCE_PASSWORD=${POSTGRES_RESOURCE_PASSWORD}
+      - RESOURCE_SERVER_PORT=${RESOURCE_SERVER_PORT}
+      - SONG_SERVER_HOST=song-service
+      - SONG_SERVER_POST=${SONG_SERVER_PORT}
+    ports:
+      - "${RESOURCE_SERVER_PORT}:${RESOURCE_SERVER_PORT}"
 
-networks:
-  postgres-network:
-    driver: bridge
+  song-service:
+    build:
+      context: .
+      dockerfile: ./song-service/Dockerfile
+    container_name: song-service
+    depends_on:
+      - song-db
+    environment:
+      - POSTGRES_SONG_HOST=song-db
+      - POSTGRES_SONG_PORT=5432
+      - POSTGRES_SONG_DB=${POSTGRES_SONG_DB}
+      - POSTGRES_SONG_USER=${POSTGRES_SONG_USER}
+      - POSTGRES_SONG_PASSWORD=${POSTGRES_SONG_PASSWORD}
+      - SONG_SERVER_PORT=${SONG_SERVER_PORT}
+    ports:
+      - "${SONG_SERVER_PORT}:${SONG_SERVER_PORT}"
