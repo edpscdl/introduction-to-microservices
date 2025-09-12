@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS songs_metadata
+CREATE TABLE songs_metadata
 (
     id       BIGINT       NOT NULL,
     name     VARCHAR(255) NOT NULL,
