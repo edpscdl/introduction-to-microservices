@@ -14,9 +14,9 @@ import java.util.Map;
 @FeignClient(name = "song-service", url = "${rest.song_endpoint}", configuration = FeignConfiguration.class)
 public interface SongServiceClient {
 
-    @PostMapping
+    @PostMapping(path = "/songs")
     ResponseEntity<Map<String, Long>> create(@RequestBody Mp3FileMetadataRequestDto mp3FileMetadataRequestDto);
 
-    @DeleteMapping
+    @DeleteMapping(path = "/songs")
     ResponseEntity<Map<String, List<Long>>> delete(@RequestParam("id") String csvIds);
 }

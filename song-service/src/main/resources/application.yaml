@@ -1,19 +1,21 @@
+server:
+  port: ${SONG_SERVER_PORT:8082}
+
 spring:
   application:
     name: song-service
   datasource:
-    url: jdbc:postgresql://${POSTGRES_SONG_HOST:localhost}:${POSTGRES_SONG_PORT:5433}/${POSTGRES_SONG_DB:song}
-    username: ${POSTGRES_SONG_USER:song_user}
-    password: ${POSTGRES_SONG_PASSWORD:song_password}
+    url: ${SONG_RESOURCE_POSTGRES_CONNECTION_STRING:jdbc:postgresql://localhost:5432/song}
+#    url: jdbc:postgresql://${POSTGRES_SONG_HOST:localhost}:${POSTGRES_SONG_PORT:5433}/${POSTGRES_SONG_DB:song}
+    username: ${SONG_POSTGRES_USER_NAME:song_user}
+    password: ${SONG_POSTGRES_USER_PASSWORD:song_password}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: true
-server:
-  port: ${SONG_SERVER_PORT:8082}
 
 eureka:
   client:
     service-url:
-      defaultZone: http://${EUREKA_SERVER_HOST:discovery-service}:${EUREKA_SERVER_PORT:8761}/eureka
+      defaultZone: ${EUREKA_SERVER_ULR:http://discovery-service:8761/eureka}
