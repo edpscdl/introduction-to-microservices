@@ -2,3 +2,5 @@ rootProject.name = 'introduction-to-microservices'
 
 include 'resource-service'
 include 'song-service'
+include 'discovery-service'
+include 'gateway-service'

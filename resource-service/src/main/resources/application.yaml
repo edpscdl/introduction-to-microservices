@@ -2,9 +2,10 @@ spring:
   application:
     name: resource-service
   datasource:
-    url: jdbc:postgresql://${POSTGRES_RESOURCE_HOST:localhost}:${POSTGRES_RESOURCE_PORT:5432}/${POSTGRES_RESOURCE_DB:resource}
-    username: ${POSTGRES_RESOURCE_USER:resource_user}
-    password: ${POSTGRES_RESOURCE_PASSWORD:resource_password}
+#    url: ${RESOURCE_POSTGRES_CONNECTION_STRING:jdbc:postgresql://localhost:5432/resource}
+    url: jdbc:postgresql://${RESOURCE_POSTGRES_HOST:localhost}:${RESOURCE_POSTGRES_PORT:5432}/${RESOURCE_POSTGRES_DB:resource}
+    username: ${RESOURCE_POSTGRES_USER:resource_user}
+    password: ${RESOURCE_POSTGRES_PASSWORD:resource_password}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -13,5 +14,10 @@ spring:
 server:
   port: ${RESOURCE_SERVER_PORT:8081}
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_SERVER_HOST:discovery-service}:${EUREKA_SERVER_PORT:8761}/eureka
+
 rest:
-  song_endpoint: http://${SONG_SERVER_HOST:localhost}:${SONG_SERVER_POST:8082}/songs
+  song_endpoint: http://${SONG_SERVER_HOST:localhost}:${SONG_SERVER_PORT:8082}/songs

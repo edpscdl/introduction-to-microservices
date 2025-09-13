@@ -6,11 +6,16 @@ services:
     container_name: resource-db
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_RESOURCE_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_RESOURCE_PASSWORD}
-      POSTGRES_DB: resource
+      POSTGRES_USER: ${RESOURCE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${RESOURCE_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${RESOURCE_POSTGRES_DB}
+      PGPORT: ${RESOURCE_POSTGRES_PORT}
+    networks:
+      default:
+        aliases:
+          - ${RESOURCE_POSTGRES_HOST}
     ports:
-      - "${POSTGRES_RESOURCE_PORT}:5432"
+      - "${RESOURCE_POSTGRES_PORT}:${RESOURCE_POSTGRES_PORT}"
     volumes:
       - ./init-db/resource-db:/docker-entrypoint-initdb.d/
 
@@ -19,11 +24,16 @@ services:
     container_name: song-db
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_SONG_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_SONG_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_SONG_DB}
+      POSTGRES_USER: ${SONG_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${SONG_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${SONG_POSTGRES_DB}
+      PGPORT: ${SONG_POSTGRES_PORT}
+    networks:
+      default:
+        aliases:
+          - ${SONG_POSTGRES_HOST}
     ports:
-      - "${POSTGRES_SONG_PORT}:5432"
+      - "${SONG_POSTGRES_PORT}:${SONG_POSTGRES_PORT}"
     volumes:
       - ./init-db/song-db:/docker-entrypoint-initdb.d/
 
@@ -32,33 +42,78 @@ services:
       context: .
       dockerfile: ./resource-service/Dockerfile
     container_name: resource-service
-    depends_on:
-      - resource-db
     environment:
-      - POSTGRES_RESOURCE_HOST=resource-db
-      - POSTGRES_RESOURCE_PORT=5432
-      - POSTGRES_RESOURCE_DB=${POSTGRES_RESOURCE_DB}
-      - POSTGRES_RESOURCE_USER=${POSTGRES_RESOURCE_USER}
-      - POSTGRES_RESOURCE_PASSWORD=${POSTGRES_RESOURCE_PASSWORD}
+#      - RESOURCE_POSTGRES_CONNECTION_STRING=jdbc:postgresql://${RESOURCE_POSTGRES_HOST}:${RESOURCE_POSTGRES_PORT}/${RESOURCE_POSTGRES_DB}
+      - RESOURCE_POSTGRES_HOST=${RESOURCE_POSTGRES_HOST}
+      - RESOURCE_POSTGRES_PORT=${RESOURCE_POSTGRES_PORT}
+      - RESOURCE_POSTGRES_DB=${RESOURCE_POSTGRES_DB}
+      - RESOURCE_POSTGRES_USER=${RESOURCE_POSTGRES_USER}
+      - RESOURCE_POSTGRES_PASSWORD=${RESOURCE_POSTGRES_PASSWORD}
       - RESOURCE_SERVER_PORT=${RESOURCE_SERVER_PORT}
-      - SONG_SERVER_HOST=song-service
-      - SONG_SERVER_POST=${SONG_SERVER_PORT}
+      - EUREKA_SERVER_HOST=${EUREKA_SERVER_HOST}
+      - EUREKA_SERVER_PORT=${EUREKA_SERVER_PORT}
+      - SONG_SERVER_HOST=${SONG_SERVER_HOST}
+      - SONG_SERVER_PORT=${SONG_SERVER_PORT}
+    networks:
+      default:
+        aliases:
+          - ${RESOURCE_SERVER_HOST}
     ports:
       - "${RESOURCE_SERVER_PORT}:${RESOURCE_SERVER_PORT}"
+    depends_on:
+      - resource-db
 
   song-service:
     build:
       context: .
       dockerfile: ./song-service/Dockerfile
     container_name: song-service
-    depends_on:
-      - song-db
     environment:
-      - POSTGRES_SONG_HOST=song-db
-      - POSTGRES_SONG_PORT=5432
-      - POSTGRES_SONG_DB=${POSTGRES_SONG_DB}
-      - POSTGRES_SONG_USER=${POSTGRES_SONG_USER}
-      - POSTGRES_SONG_PASSWORD=${POSTGRES_SONG_PASSWORD}
+      - POSTGRES_CONNECTION_STRING=jdbc:postgresql://${SONG_POSTGRES_HOST}:${SONG_POSTGRES_PORT}/${SONG_POSTGRES_DB}
+      - SONG_POSTGRES_USER=${SONG_POSTGRES_USER}
+      - SONG_POSTGRES_PASSWORD=${SONG_POSTGRES_PASSWORD}
       - SONG_SERVER_PORT=${SONG_SERVER_PORT}
+      - EUREKA_SERVER_HOST=${EUREKA_SERVER_HOST}
+      - EUREKA_SERVER_PORT=${EUREKA_SERVER_PORT}
+    networks:
+      default:
+        aliases:
+          - ${SONG_SERVER_HOST}
     ports:
       - "${SONG_SERVER_PORT}:${SONG_SERVER_PORT}"
+    depends_on:
+      - song-db
+
+  discovery-service:
+    build:
+      context: .
+      dockerfile: ./discovery-service/Dockerfile
+    container_name: discovery-service
+    environment:
+      - EUREKA_SERVER_PORT=${EUREKA_SERVER_PORT}
+    networks:
+      default:
+        aliases:
+          - ${EUREKA_SERVER_HOST}
+    ports:
+      - "${EUREKA_SERVER_PORT}:${EUREKA_SERVER_PORT}"
+
+  gateway-service:
+    build:
+      context: .
+      dockerfile: ./gateway-service/Dockerfile
+    container_name: gateway-service
+    environment:
+      - GATEWAY_SERVER_PORT=${GATEWAY_SERVER_PORT}
+      - EUREKA_SERVER_HOST=${EUREKA_SERVER_HOST}
+      - EUREKA_SERVER_PORT=${EUREKA_SERVER_PORT}
+    networks:
+      default:
+        aliases:
+          - ${GATEWAY_SERVER_HOST}
+    ports:
+      - "${GATEWAY_SERVER_PORT}:${GATEWAY_SERVER_PORT}"
+    depends_on:
+      - discovery-service
+      - resource-service
+      - song-service
