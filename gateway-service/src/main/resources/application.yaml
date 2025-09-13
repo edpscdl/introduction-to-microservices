@@ -9,10 +9,6 @@ spring:
     gateway:
       server:
         webflux:
-#          discovery:
-#            locator:
-#              enabled: true
-#              lower-case-service-id: true
           routes:
             - id: resource-service
               uri: lb://resource-service
@@ -30,4 +26,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER_ULR:http://discovery-service:8761/eureka}
+      defaultZone: ${EUREKA_SERVER_ULR:http://localhost:8761/eureka}
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: true

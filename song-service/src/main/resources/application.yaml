@@ -5,8 +5,7 @@ spring:
   application:
     name: song-service
   datasource:
-    url: ${SONG_RESOURCE_POSTGRES_CONNECTION_STRING:jdbc:postgresql://localhost:5432/song}
-#    url: jdbc:postgresql://${POSTGRES_SONG_HOST:localhost}:${POSTGRES_SONG_PORT:5433}/${POSTGRES_SONG_DB:song}
+    url: ${SONG_RESOURCE_POSTGRES_CONNECTION_STRING:jdbc:postgresql://localhost:5433/song}
     username: ${SONG_POSTGRES_USER_NAME:song_user}
     password: ${SONG_POSTGRES_USER_PASSWORD:song_password}
     driver-class-name: org.postgresql.Driver
@@ -18,4 +17,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER_ULR:http://discovery-service:8761/eureka}
+      defaultZone: ${EUREKA_SERVER_ULR:http://localhost:8761/eureka}
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: true

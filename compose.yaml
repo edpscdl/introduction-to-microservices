@@ -3,39 +3,27 @@ version: '3.9'
 services:
   resource-db:
     image: postgres:17.6-alpine3.22
-    container_name: resource-db
     restart: always
     environment:
       POSTGRES_USER: ${RESOURCE_POSTGRES_USER_NAME}
       POSTGRES_PASSWORD: ${RESOURCE_POSTGRES_USER_PASSWORD}
       POSTGRES_DB: ${RESOURCE_POSTGRES_DB_NAME}
       PGPORT: ${RESOURCE_POSTGRES_PORT}
-#    networks:
-#      default:
-#        aliases:
-#          - ${RESOURCE_POSTGRES_HOST}
     ports:
       - "${RESOURCE_POSTGRES_PORT}:${RESOURCE_POSTGRES_PORT}"
-#      - "${RESOURCE_POSTGRES_PORT}:5432"
     volumes:
       - ./init-db/resource-db:/docker-entrypoint-initdb.d/
 
   song-db:
     image: postgres:17.6-alpine3.22
-    container_name: song-db
     restart: always
     environment:
       POSTGRES_USER: ${SONG_POSTGRES_USER_NAME}
       POSTGRES_PASSWORD: ${SONG_POSTGRES_USER_PASSWORD}
       POSTGRES_DB: ${SONG_POSTGRES_DB_NAME}
       PGPORT: ${SONG_POSTGRES_PORT}
-#    networks:
-#      default:
-#        aliases:
-#          - ${SONG_POSTGRES_HOST}
     ports:
       - "${SONG_POSTGRES_PORT}:${SONG_POSTGRES_PORT}"
-#      - "${SONG_POSTGRES_PORT}:5432"
     volumes:
       - ./init-db/song-db:/docker-entrypoint-initdb.d/
 
@@ -43,23 +31,15 @@ services:
     build:
       context: .
       dockerfile: ./resource-service/Dockerfile
-    container_name: resource-service
     environment:
       - RESOURCE_POSTGRES_CONNECTION_STRING=jdbc:postgresql://${RESOURCE_POSTGRES_HOST}:${RESOURCE_POSTGRES_PORT}/${RESOURCE_POSTGRES_DB_NAME}
-#      - RESOURCE_POSTGRES_HOST=${RESOURCE_POSTGRES_HOST}
-#      - RESOURCE_POSTGRES_PORT=${RESOURCE_POSTGRES_PORT}
-#      - RESOURCE_POSTGRES_DB_NAME=${RESOURCE_POSTGRES_DB_NAME}
       - RESOURCE_POSTGRES_USER_NAME=${RESOURCE_POSTGRES_USER_NAME}
       - RESOURCE_POSTGRES_USER_PASSWORD=${RESOURCE_POSTGRES_USER_PASSWORD}
       - RESOURCE_SERVER_PORT=${RESOURCE_SERVER_PORT}
       - EUREKA_SERVER_ULR=http://${EUREKA_SERVER_HOST}:${EUREKA_SERVER_PORT}/eureka
       - SONG_SERVICE_URL=http://${GATEWAY_SERVER_HOST}:${GATEWAY_SERVER_PORT}/${SONG_SERVER_HOST}
-#    networks:
-#      default:
-#        aliases:
-#          - ${RESOURCE_SERVER_HOST}
-    ports:
-      - "${RESOURCE_SERVER_PORT}:${RESOURCE_SERVER_PORT}"
+#    ports:
+#      - "${RESOURCE_SERVER_PORT}:${RESOURCE_SERVER_PORT}"
     depends_on:
       - resource-db
 
@@ -67,22 +47,16 @@ services:
     build:
       context: .
       dockerfile: ./song-service/Dockerfile
-    container_name: song-service
+#    deploy:
+#      replicas: 2
     environment:
       - SONG_RESOURCE_POSTGRES_CONNECTION_STRING=jdbc:postgresql://${SONG_POSTGRES_HOST}:${SONG_POSTGRES_PORT}/${SONG_POSTGRES_DB_NAME}
-#      - SONG_POSTGRES_HOST=${SONG_POSTGRES_HOST}
-#      - SONG_POSTGRES_PORT=${SONG_POSTGRES_PORT}
-#      - SONG_POSTGRES_DB_NAME=${SONG_POSTGRES_DB_NAME}
       - SONG_POSTGRES_USER_NAME=${SONG_POSTGRES_USER_NAME}
       - SONG_POSTGRES_USER_PASSWORD=${SONG_POSTGRES_USER_PASSWORD}
       - SONG_SERVER_PORT=${SONG_SERVER_PORT}
       - EUREKA_SERVER_ULR=http://${EUREKA_SERVER_HOST}:${EUREKA_SERVER_PORT}/eureka
-#    networks:
-#      default:
-#        aliases:
-#          - ${SONG_SERVER_HOST}
-    ports:
-      - "${SONG_SERVER_PORT}:${SONG_SERVER_PORT}"
+#    ports:
+#      - "${SONG_SERVER_PORT_START}-${SONG_SERVER_PORT_END}:${SONG_SERVER_PORT}"
     depends_on:
       - song-db
 
@@ -90,13 +64,8 @@ services:
     build:
       context: .
       dockerfile: ./discovery-service/Dockerfile
-    container_name: discovery-service
     environment:
       - EUREKA_SERVER_PORT=${EUREKA_SERVER_PORT}
-#    networks:
-#      default:
-#        aliases:
-#          - ${EUREKA_SERVER_HOST}
     ports:
       - "${EUREKA_SERVER_PORT}:${EUREKA_SERVER_PORT}"
 
@@ -104,14 +73,9 @@ services:
     build:
       context: .
       dockerfile: ./gateway-service/Dockerfile
-    container_name: gateway-service
     environment:
       - GATEWAY_SERVER_PORT=${GATEWAY_SERVER_PORT}
       - EUREKA_SERVER_ULR=http://${EUREKA_SERVER_HOST}:${EUREKA_SERVER_PORT}/eureka
-#    networks:
-#      default:
-#        aliases:
-#          - ${GATEWAY_SERVER_HOST}
     ports:
       - "${GATEWAY_SERVER_PORT}:${GATEWAY_SERVER_PORT}"
     depends_on:
